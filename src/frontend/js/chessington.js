@@ -1,13 +1,13 @@
-import Board from '../../engine/board';
-import GameSettings from '../../engine/gameSettings';
-import Player from '../../engine/player';
-import Square from '../../engine/square';
-import Pawn from '../../engine/pieces/pawn';
-import Rook from '../../engine/pieces/rook';
-import Knight from '../../engine/pieces/knight';
-import Bishop from '../../engine/pieces/bishop';
-import Queen from '../../engine/pieces/queen';
-import King from '../../engine/pieces/king';
+import Board from '../../engine/board.js';
+import GameSettings from '../../engine/gameSettings.js';
+import Player from '../../engine/player.js';
+import Square from '../../engine/square.js';
+import Pawn from '../../engine/pieces/pawn.js';
+import Rook from '../../engine/pieces/rook.js';
+import Knight from '../../engine/pieces/knight.js';
+import Bishop from '../../engine/pieces/bishop.js';
+import Queen from '../../engine/pieces/queen.js';
+import King from '../../engine/pieces/king.js';
 
 let boardUI;
 let board;

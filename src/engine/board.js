@@ -1,6 +1,6 @@
-import Player from './player';
-import GameSettings from './gameSettings';
-import Square from './square';
+import Player from './player.js';
+import GameSettings from './gameSettings.js';
+import Square from './square.js';
 
 export default class Board {
     constructor() {
