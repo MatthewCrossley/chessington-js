@@ -11,20 +11,8 @@ export default class Bishop extends Piece {
 
         const currentSquare = board.findPiece(this)
 
-        let increments = [[1,1], [1,-1], [-1,1], [-1,-1]]
-        for (let inc of increments){
-            let rowInc = inc[0]
-            let colInc = inc[1]
-            var lastMove = currentSquare
-            while (true) {
-                let tmpMove = Square.at(lastMove.row + rowInc, lastMove.col + colInc)
-                if (board.availableSquare(tmpMove)){
-                    moves.push(tmpMove)
-                } else {
-                    break
-                }
-                lastMove = tmpMove
-            }
+        for (let inc of [[1,1], [1,-1], [-1,1], [-1,-1]]){
+            moves.push.apply(moves, this.checkAvailableMoves(board, currentSquare, ...inc))
         }
 
         return moves;

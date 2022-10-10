@@ -23,4 +23,19 @@ export default class Piece {
             currentSquare.col + (cols === 0 ? 0 : cols * direction)
         )
     }
+
+    checkAvailableMoves(board, currentSquare, rowIncrement, colIncrement){
+        let moves = []
+        var lastMove = currentSquare
+        while (true){
+            let tmpMove = Square.at(lastMove.row + rowIncrement, lastMove.col + colIncrement)
+            if (board.availableSquare(tmpMove)){
+                moves.push(tmpMove)
+            } else {
+                break
+            }
+            lastMove = tmpMove
+        }
+        return moves
+    }
 }
