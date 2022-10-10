@@ -30,19 +30,18 @@ export default class Rook extends Piece {
 
         const currentSquare = board.findPiece(this)
 
-        let moves = []
-
         let vertSquareMaker = (i, c=currentSquare.col) => { return Square.at(i, c) }
-        // check all squares above the corrent position
-        moves = moves.concat(checkRange(currentSquare.row + 1, board.board.length, vertSquareMaker))
-        // check all squares below the current position
-        moves = moves.concat(checkRange(currentSquare.row - 1, -1, vertSquareMaker))
-
         let horiSquareMaker = (i, r=currentSquare.row) => { return Square.at(r, i) }
-        // check all squares to the right
-        moves = moves.concat(checkRange(currentSquare.col + 1, board.board.length, horiSquareMaker))
-        // check all squares to the left
-        moves = moves.concat(checkRange(currentSquare.col - 1, -1, horiSquareMaker))
+        let moves = [].concat(
+            // check all squares above the corrent position
+            checkRange(currentSquare.row + 1, board.board.length, vertSquareMaker),
+            // check all squares below the current position
+            checkRange(currentSquare.row - 1, -1, vertSquareMaker),
+            // check all squares to the right
+            checkRange(currentSquare.col + 1, board.board.length, horiSquareMaker),
+            // check all squares to the left
+            checkRange(currentSquare.col - 1, -1, horiSquareMaker)
+        )
 
         return moves;
     }
