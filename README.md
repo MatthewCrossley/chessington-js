@@ -2,8 +2,8 @@
 Starter project for a chess-based TDD exercise
 
 Install with `npm install`
-Run tests with `npm test`
-Start program with `npm start`. This will host a server on `localhost:3000`
+Run tests with `make test`
+Start program with `make start`. This will host a server on `localhost:3000`
 
 
 Guide to the code
