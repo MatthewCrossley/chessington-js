@@ -17,10 +17,10 @@ export default class Board {
     }
 
     availableSquare(square){
-        if (square.col < 0 || square.col > this.board.length){
+        if (square.col < 0 || square.col >= this.board.length){
             return false
         }
-        if (square.row < 0 || square.row > this.board.length){
+        if (square.row < 0 || square.row >= this.board.length){
             return false
         }
         return (!this.getPiece(square))
