@@ -34,9 +34,7 @@ export default class Piece {
         if (board.squareExists(square)){
             // square not available. Check if there is a piece there we can take
             let takePiece = board.getPiece(square)
-            if (takePiece.player !== this.player && takePiece.cannotTake !== true){
-                return "take"
-            }
+            return (takePiece.player !== this.player && takePiece.cannotTake !== true)
         }
         return false
     }
