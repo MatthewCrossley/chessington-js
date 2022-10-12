@@ -1,4 +1,3 @@
-import Square from '../square';
 import Piece from './piece';
 
 export default class Rook extends Piece {
