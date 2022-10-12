@@ -24,13 +24,35 @@ export default class Piece {
         )
     }
 
+    canMoveTo(board, square, allowTakes=true){
+        if (board.availableSquare(square)){
+            return true
+        }
+        if (allowTakes !== true){
+            return false
+        }
+        if (board.squareExists(square)){
+            // square not available. Check if there is a piece there we can take
+            let takePiece = board.getPiece(square)
+            if (takePiece.player !== this.player && takePiece.cannotTake !== true){
+                return "take"
+            }
+        }
+        return false
+    }
+
     checkAvailableMoves(board, currentSquare, rowIncrement, colIncrement){
         let moves = []
         var lastMove = currentSquare
         while (true){
             let tmpMove = Square.at(lastMove.row + rowIncrement, lastMove.col + colIncrement)
-            if (board.availableSquare(tmpMove)){
+            if (this.canMoveTo(board, tmpMove)){
                 moves.push(tmpMove)
+                if (!board.availableSquare(tmpMove)){
+                    // we can move there but only to take a piece
+                    // so break here so we don't calculate moves beyond this piece
+                    break
+                }
             } else {
                 break
             }

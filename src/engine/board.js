@@ -16,13 +16,21 @@ export default class Board {
         return board;
     }
 
-    availableSquare(square){
+    squareExists(square){
         if (square.col < 0 || square.col >= this.board.length){
             return false
         }
         if (square.row < 0 || square.row >= this.board.length){
             return false
         }
+        return true
+    }
+
+    availableSquare(square){
+        if (!this.squareExists(square)){
+            return false
+        }
+
         return (!this.getPiece(square))
     }
 

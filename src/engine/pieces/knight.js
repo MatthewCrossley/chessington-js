@@ -17,7 +17,7 @@ export default class Knight extends Piece {
                     continue
                 }
                 let tmpMove = Square.at(currentSquare.row + i, currentSquare.col + j)
-                if (board.availableSquare(tmpMove)){
+                if (this.canMoveTo(board, tmpMove)){
                     moves.push(tmpMove)
                 }
             }
