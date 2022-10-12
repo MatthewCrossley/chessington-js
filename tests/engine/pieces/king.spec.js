@@ -76,4 +76,17 @@ describe('King', () => {
 
         moves.should.not.deep.include(Square.at(5, 5));
     });
+
+    it('cannot move to a square that would put it in check', () => {
+        const king = new King(Player.WHITE);
+        const hostilePiece = new Pawn(Player.BLACK);
+        board.setPiece(Square.at(2, 5), king);
+        board.setPiece(Square.at(4, 5), hostilePiece);
+
+        const moves = king.getAvailableMoves(board);
+
+        // these are the positions the pawn can "take"
+        const cannotMoveTo = [Square.at(3, 4), Square.at(3, 6)];
+        moves.should.not.deep.include.members(cannotMoveTo);
+    });
 });
