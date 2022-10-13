@@ -1,6 +1,7 @@
 import 'chai/register-should';
 import King from '../../../src/engine/pieces/king';
 import Pawn from '../../../src/engine/pieces/pawn';
+import Knight from '../../../src/engine/pieces/knight';
 import Board from '../../../src/engine/board';
 import Player from '../../../src/engine/player';
 import Square from '../../../src/engine/square';
@@ -79,14 +80,25 @@ describe('King', () => {
 
     it('cannot move to a square that would put it in check', () => {
         const king = new King(Player.WHITE);
-        const hostilePiece = new Pawn(Player.BLACK);
+        const hostileKing = new King(Player.BLACK);
+        const hostileKnight = new Knight(Player.BLACK)
+        const hostilePawn = new Pawn(Player.BLACK);
         board.setPiece(Square.at(2, 5), king);
-        board.setPiece(Square.at(4, 5), hostilePiece);
+        board.setPiece(Square.at(2, 7), hostileKing);
+        board.setPiece(Square.at(4, 3), hostileKnight);
+        board.setPiece(Square.at(4, 5), hostilePawn);
 
         const moves = king.getAvailableMoves(board);
 
         // these are the positions the pawn can "take"
-        const cannotMoveTo = [Square.at(3, 4), Square.at(3, 6)];
+        const cannotMoveTo = [
+            Square.at(1, 6),  // covered by hostile king
+            Square.at(3, 4),  // covered by hostile pawn
+            Square.at(3, 5),  // covered by hostile knight
+            Square.at(3, 6),  // covered by hostile pawn and king
+            Square.at(4, 2),  // covered by hostile knight
+            Square.at(4, 6)   // covered by hostile king
+        ];
         moves.should.not.deep.include.members(cannotMoveTo);
     });
 });
