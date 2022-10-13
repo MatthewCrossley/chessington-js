@@ -118,7 +118,6 @@ describe('King', () => {
             board.setPiece(Square.at(0, 7), rookKingSide);
 
             const moves = king.getAvailableMoves(board);
-            console.log(moves)
             moves.should.deep.include.members([Square.at(0, 2), Square.at(0, 6)])
         });
 
@@ -150,6 +149,60 @@ describe('King', () => {
 
             const moves = king.getAvailableMoves(board);
             moves.should.not.deep.include.members([Square.at(0, 2), Square.at(0, 6)])
+        });
+
+        it('cannot castle if moving through check', () => {
+            const king = new King(Player.WHITE);
+            const rookQueenSide = new Rook(Player.WHITE);
+            const rookKingSide = new Rook(Player.WHITE);
+            const hostileQueen = new Queen(Player.BLACK);
+            board.setPiece(Square.at(0, 4), king);
+            board.setPiece(Square.at(0, 0), rookQueenSide);
+            board.setPiece(Square.at(0, 7), rookKingSide);
+            board.setPiece(Square.at(2, 3), hostileQueen);
+
+            const moves = king.getAvailableMoves(board);
+            moves.should.not.deep.include.members([Square.at(0, 2), Square.at(0, 6)])
+        });
+
+        it('cannot castle if moving into check', () => {
+            const king = new King(Player.WHITE);
+            const rookQueenSide = new Rook(Player.WHITE);
+            const rookKingSide = new Rook(Player.WHITE);
+            const hostileQueen = new Queen(Player.BLACK);
+            board.setPiece(Square.at(0, 4), king);
+            board.setPiece(Square.at(0, 0), rookQueenSide);
+            board.setPiece(Square.at(0, 7), rookKingSide);
+            board.setPiece(Square.at(4, 2), hostileQueen);
+
+            const moves = king.getAvailableMoves(board);
+            moves.should.not.deep.include.members([Square.at(0, 2), Square.at(0, 6)])
+        });
+
+        it('can castle if rook is checked', () => {
+            const king = new King(Player.WHITE);
+            const rookQueenSide = new Rook(Player.WHITE);
+            const rookKingSide = new Rook(Player.WHITE);
+            const hostileQueen = new Queen(Player.BLACK);
+            board.setPiece(Square.at(0, 4), king);
+            board.setPiece(Square.at(0, 0), rookQueenSide);
+            board.setPiece(Square.at(0, 7), rookKingSide);
+            board.setPiece(Square.at(7, 0), hostileQueen);
+
+            const moves = king.getAvailableMoves(board);
+            moves.should.deep.include.members([Square.at(0, 2), Square.at(0, 6)])
+        });
+
+        it('queenside rook can move through check when castling', () => {
+            const king = new King(Player.WHITE);
+            const rookQueenSide = new Rook(Player.WHITE);
+            const hostileQueen = new Queen(Player.BLACK);
+            board.setPiece(Square.at(0, 4), king);
+            board.setPiece(Square.at(0, 0), rookQueenSide);;
+            board.setPiece(Square.at(7, 1), hostileQueen);
+
+            const moves = king.getAvailableMoves(board);
+            moves.should.deep.include(Square.at(0, 2))
         });
     });
 });
