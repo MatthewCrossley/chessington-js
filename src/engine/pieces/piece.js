@@ -58,4 +58,13 @@ export default class Piece {
         }
         return moves
     }
+
+    canCheck(board, square){
+        let p = board.getPiece(square)
+        if (p !== undefined && p.player === this.player){
+            return false
+        }
+
+        return (this.getAvailableMoves(board).indexOf(square) !== -1)
+    }
 }

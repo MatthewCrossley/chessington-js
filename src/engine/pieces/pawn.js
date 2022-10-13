@@ -1,4 +1,5 @@
 import Player from '../player';
+import Square from '../square';
 import Piece from './piece';
 
 export default class Pawn extends Piece {
@@ -29,5 +30,19 @@ export default class Pawn extends Piece {
         }
 
         return moves;
+    }
+
+    canCheck(board, square){
+        let p = board.getPiece(square)
+        if (p !== undefined && p.player === this.player){
+            return false
+        }
+
+        for (let diag of [-1, 1]){
+            if (square.equals(this.squareFromCurrent(board, 1, diag))){
+                return true
+            }
+        }
+        return false
     }
 }
