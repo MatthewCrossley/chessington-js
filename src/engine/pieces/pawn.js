@@ -7,6 +7,25 @@ export default class Pawn extends Piece {
         super(player);
     }
 
+    enPassant(board, currentSquare, diagMove){
+        if (diagMove.col - currentSquare.col === 0){
+            return undefined
+        }
+        let enPassant = Square.at(currentSquare.row, diagMove.col)
+        let hostilePiece = board.getPiece(enPassant)
+        if (hostilePiece instanceof Pawn){
+            if (hostilePiece.player !== this.player){
+                if (hostilePiece.moveHistory.length === 2){
+                    // if has moved initial pos -> new pos
+                    if (Math.abs(hostilePiece.moveHistory[0].row - hostilePiece.moveHistory[1].row) === 2){
+                        // if that initial move was indeed 2 places
+                        return hostilePiece
+                    }
+                }
+            }
+        }
+    }
+
     getAvailableMoves(board) {
         let baseRow = this.player == Player.WHITE? 1 : 6
         const currentSquare = board.findPiece(this)
@@ -14,8 +33,17 @@ export default class Pawn extends Piece {
 
         for (let diag of [-1, 1]){
             let diagMove = this.squareFromCurrent(board, 1, diag)
-            if (!board.availableSquare(diagMove) && this.canMoveTo(board, diagMove)){
-                moves.push(diagMove)
+            if (this.canMoveTo(board, diagMove)){
+                // ^ if the square is EMPTY OR has a piece we can take
+                if (!board.availableSquare(diagMove)){
+                    // ^ if there is a piece we can take
+                    moves.push(diagMove)
+                } else {
+                    let passantPiece = this.enPassant(board, currentSquare, diagMove)
+                    if (passantPiece !== undefined){
+                        moves.push(diagMove)
+                    }
+                }
             }
         }
 
@@ -30,6 +58,16 @@ export default class Pawn extends Piece {
         }
 
         return moves;
+    }
+
+    moveTo(board, newSquare){
+        let currentSquare = board.findPiece(this)
+        let passantPiece = this.enPassant(board, currentSquare, newSquare)
+        if (passantPiece !== undefined){
+            board.setPiece(board.findPiece(passantPiece), undefined)
+            passantPiece.moveHistory = []
+        }
+        super.moveTo(board, newSquare)
     }
 
     canCheck(board, square){
