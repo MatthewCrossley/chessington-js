@@ -90,7 +90,7 @@ describe('King', () => {
 
         const moves = king.getAvailableMoves(board);
 
-        // these are the positions the pawn can "take"
+        // these are the positions the hostile pieces can "take"
         const cannotMoveTo = [
             Square.at(1, 6),  // covered by hostile king
             Square.at(3, 4),  // covered by hostile pawn
