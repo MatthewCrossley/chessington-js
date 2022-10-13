@@ -6,7 +6,7 @@ export default class Knight extends Piece {
         super(player);
     }
 
-    getAvailableMoves(board) {
+    _getAvailableMoves(board) {
         let moves = []
 
         let currentSquare = board.findPiece(this)

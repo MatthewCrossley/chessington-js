@@ -26,7 +26,7 @@ export default class Pawn extends Piece {
         }
     }
 
-    getAvailableMoves(board) {
+    _getAvailableMoves(board) {
         let baseRow = this.player == Player.WHITE? 1 : 6
         const currentSquare = board.findPiece(this)
         let moves = []

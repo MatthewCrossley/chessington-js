@@ -7,8 +7,24 @@ export default class Piece {
         this.moveHistory = [];
     }
 
-    getAvailableMoves(board) {
+    _getAvailableMoves(board) {
         throw new Error('This method must be implemented, and return a list of available moves');
+    }
+
+    getAvailableMoves(board, allowChecks=false){
+        let allMoves = this._getAvailableMoves(board)
+        if (allowChecks !== false){
+            return allMoves
+        }
+        let moves = []
+        for (let move of allMoves){
+            let p = board.getPiece(move)
+            if (p !== undefined && p.cannotTake === true){
+                continue
+            }
+            moves.push(move)
+        }
+        return moves
     }
 
     moveTo(board, newSquare) {
@@ -39,7 +55,7 @@ export default class Piece {
         if (board.squareExists(square)){
             // square not available. Check if there is a piece there we can take
             let takePiece = board.getPiece(square)
-            return (takePiece.player !== this.player && takePiece.cannotTake !== true)
+            return (takePiece !== undefined && takePiece.player !== this.player)
         }
         return false
     }
@@ -70,6 +86,6 @@ export default class Piece {
             return false
         }
 
-        return (this.getAvailableMoves(board).indexOf(square) !== -1)
+        return this.getAvailableMoves(board, {allowChecks: true}).some(item => square.equals(item))
     }
 }
