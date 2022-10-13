@@ -64,14 +64,12 @@ export default class King extends Piece {
             let availableMoves = this.checkAvailableMoves(board, currentSquare, 0, direction)
 
             if (availableMoves.length >= 2){
-                if (Math.abs(availableMoves.at(-1).col - rookPos.col) === 1){
-                    // if all squares are free up until the rook itself
-                    if (availableMoves.length === 2){
-                        castleMoves.push(availableMoves.at(-1))
-                    } else {
-                        // queenside rooks are 1 square further away
-                        castleMoves.push(availableMoves.at(-2))
-                    }
+                // if all squares are free up until the rook itself
+                if (availableMoves.length === 2){
+                    castleMoves.push(availableMoves.at(-1))
+                } else {
+                    // queenside rooks are 1 square further away
+                    castleMoves.push(availableMoves.at(-2))
                 }
             }
         }
