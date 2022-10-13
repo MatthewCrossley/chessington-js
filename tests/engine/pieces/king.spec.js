@@ -5,6 +5,8 @@ import Knight from '../../../src/engine/pieces/knight';
 import Board from '../../../src/engine/board';
 import Player from '../../../src/engine/player';
 import Square from '../../../src/engine/square';
+import Rook from '../../../src/engine/pieces/rook';
+import Queen from '../../../src/engine/pieces/queen';
 
 describe('King', () => {
 
@@ -100,5 +102,54 @@ describe('King', () => {
             Square.at(4, 6)   // covered by hostile king
         ];
         moves.should.not.deep.include.members(cannotMoveTo);
+    });
+
+    describe('castling', () => {
+
+        let board;
+        beforeEach(() => board = new Board(Player.WHITE));
+
+        it('can do castling', () => {
+            const king = new King(Player.WHITE);
+            const rookQueenSide = new Rook(Player.WHITE);
+            const rookKingSide = new Rook(Player.WHITE);
+            board.setPiece(Square.at(0, 4), king);
+            board.setPiece(Square.at(0, 0), rookQueenSide);
+            board.setPiece(Square.at(0, 7), rookKingSide);
+
+            const moves = king.getAvailableMoves(board);
+            console.log(moves)
+            moves.should.deep.include.members([Square.at(0, 2), Square.at(0, 6)])
+        });
+
+        it('cannot castle if piece is in the way', () => {
+            const king = new King(Player.WHITE);
+            const rookQueenSide = new Rook(Player.WHITE);
+            const bishopQueenSide = new Rook(Player.WHITE);
+            const bishopKingSide = new Rook(Player.WHITE);
+            const rookKingSide = new Rook(Player.WHITE);
+            board.setPiece(Square.at(0, 4), king);
+            board.setPiece(Square.at(0, 0), rookQueenSide);
+            board.setPiece(Square.at(0, 1), bishopQueenSide);
+            board.setPiece(Square.at(0, 5), bishopKingSide);
+            board.setPiece(Square.at(0, 7), rookKingSide);
+
+            const moves = king.getAvailableMoves(board);
+            moves.should.not.deep.include.members([Square.at(0, 2), Square.at(0, 6)])
+        });
+
+        it('cannot castle if king is in check', () => {
+            const king = new King(Player.WHITE);
+            const rookQueenSide = new Rook(Player.WHITE);
+            const rookKingSide = new Rook(Player.WHITE);
+            const hostileQueen = new Queen(Player.BLACK);
+            board.setPiece(Square.at(0, 4), king);
+            board.setPiece(Square.at(0, 0), rookQueenSide);
+            board.setPiece(Square.at(0, 7), rookKingSide);
+            board.setPiece(Square.at(2, 4), hostileQueen);
+
+            const moves = king.getAvailableMoves(board);
+            moves.should.not.deep.include.members([Square.at(0, 2), Square.at(0, 6)])
+        });
     });
 });
