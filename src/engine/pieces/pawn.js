@@ -1,6 +1,7 @@
 import Player from '../player';
 import Square from '../square';
 import Piece from './piece';
+import Queen from './queen';
 
 export default class Pawn extends Piece {
     constructor(player) {
@@ -67,7 +68,17 @@ export default class Pawn extends Piece {
             board.setPiece(board.findPiece(passantPiece), undefined)
             passantPiece.moveHistory = []
         }
-        super.moveTo(board, newSquare)
+
+        let maxRow = this.player === Player.WHITE ? 7: 0
+        if (newSquare.row === maxRow){
+            board.setPiece(currentSquare, undefined)
+            let promotedPawn = new Queen(this.player)
+            promotedPawn.moveHistory = this.moveHistory
+            board.setPiece(currentSquare, promotedPawn)
+            promotedPawn.moveTo(board, newSquare)
+        } else {
+            super.moveTo(board, newSquare)
+        }
     }
 
     canCheck(board, square){
