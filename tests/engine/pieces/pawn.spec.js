@@ -5,6 +5,7 @@ import King from '../../../src/engine/pieces/king';
 import Board from '../../../src/engine/board';
 import Player from '../../../src/engine/player';
 import Square from '../../../src/engine/square';
+import Queen from '../../../src/engine/pieces/queen';
 
 describe('Pawn', () => {
 
@@ -123,6 +124,16 @@ describe('Pawn', () => {
             const moves = pawn.getAvailableMoves(board);
             moves.should.not.deep.include(Square.at(5, 4));
         });
+
+        it('can be promoted to queen', () => {
+            const pawn = new Pawn(Player.WHITE);
+            board.setPiece(Square.at(6, 0), pawn);
+
+            pawn.moveTo(board, Square.at(7, 0));
+
+            const promotedPawn = board.getPiece(Square.at(7, 0));
+            promotedPawn.should.be.instanceOf(Queen)
+        });
     });
 
     describe('black pawns', () => {
@@ -240,6 +251,16 @@ describe('Pawn', () => {
             const moves = pawn.getAvailableMoves(board);
             moves.should.not.deep.include(Square.at(3, 4));
         });
+
+        it('can be promoted to queen', () => {
+            const pawn = new Pawn(Player.BLACK);
+            board.setPiece(Square.at(1, 0), pawn);
+
+            pawn.moveTo(board, Square.at(0, 0));
+
+            const promotedPawn = board.getPiece(Square.at(0, 0));
+            promotedPawn.should.be.instanceOf(Queen)
+        });
     });
 
     it('cannot move if there is a piece in front', () => {
@@ -263,5 +284,4 @@ describe('Pawn', () => {
 
         moves.should.not.deep.include(Square.at(4, 3));
     });
-
 });
