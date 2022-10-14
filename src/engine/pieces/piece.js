@@ -6,6 +6,7 @@ export default class Piece {
         this.player = player;
         this.moveHistory = [];
         this.cannotTake = false;
+        this.canJump = false;
     }
 
     _getAvailableMoves(board) {
