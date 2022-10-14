@@ -5,15 +5,12 @@ export default class Rook extends Piece {
         super(player);
     }
 
+    getMoveIncrements(){
+        return [[1,0], [-1,0], [0,1], [0,-1]]
+    }
+
     _getAvailableMoves(board) {
-        let moves = []
-
-        const currentSquare = board.findPiece(this)
-
-        for (let inc of [[1,0], [-1,0], [0,1], [0,-1]]){
-            moves.push.apply(moves, this.checkAvailableMoves(board, currentSquare, ...inc))
-        }
-
-        return moves;
+        let moveVectors = this.getMoveVectors(board)
+        return this.filterMoveVectors(board, moveVectors)
     }
 }

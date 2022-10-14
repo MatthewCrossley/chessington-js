@@ -5,20 +5,21 @@ export default class Queen extends Piece {
         super(player);
     }
 
-    _getAvailableMoves(board) {
-        let moves = []
-
-        const currentSquare = board.findPiece(this)
-
+    getMoveIncrements(){
+        let increments = []
         for (let i = -1; i <= 1; i++){
             for (let j = -1; j <= 1; j++){
                 if (i === 0 && j === 0){
                     continue
                 }
-                moves.push.apply(moves, this.checkAvailableMoves(board, currentSquare, i, j))
+                increments.push([i, j])
             }
         }
+        return increments
+    }
 
-        return moves;
+    _getAvailableMoves(board) {
+        let moveVectors = this.getMoveVectors(board)
+        return this.filterMoveVectors(board, moveVectors)
     }
 }

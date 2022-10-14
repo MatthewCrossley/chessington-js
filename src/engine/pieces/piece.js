@@ -9,6 +9,52 @@ export default class Piece {
         this.canJump = false;
     }
 
+    getMoveIncrements(){
+        return []
+    }
+
+    getMoveVectors(board){
+        let currentSquare = board.findPiece(this)
+        let vectors = []
+        for (let inc of this.getMoveIncrements()){
+            let group = []
+            let lastMove = currentSquare
+            while (true){
+                let tmpMove = Square.at(lastMove.row + inc[0], lastMove.col + inc[1])
+                if (!board.squareExists(tmpMove)){
+                    break
+                }
+                group.push(tmpMove)
+                lastMove = tmpMove
+            }
+            vectors.push(group)
+        }
+        return vectors
+    }
+
+    filterMoveVectors(board, vectors, ignoreSquares){
+        let result = []
+        for (let group of vectors){
+            for (let vector of group){
+                if (this.canMoveTo(board, vector)){
+                    result.push(vector)
+                    if (ignoreSquares !== undefined && ignoreSquares.some(sq => sq.equals(vector))){
+                        // if we should ignore any pieces in this square when
+                        // deciding how far to calculate
+                        continue
+                    }
+                    if (!board.availableSquare(vector)){
+                        // don't compute beyond what we can take
+                        break
+                    }
+                } else {
+                    break
+                }
+            }
+        }
+        return result
+    }
+
     _getAvailableMoves(board) {
         throw new Error('This method must be implemented, and return a list of available moves');
     }
