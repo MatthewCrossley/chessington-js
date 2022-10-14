@@ -65,7 +65,7 @@ export default class Piece {
                 if (checkablePiece.cannotTake === false){
                     continue
                 }
-                if (Object.keys(checkablePiece.attackers).length > 0){
+                if (checkablePiece.attackers.length > 0){
                     // if the piece's current square is checked, we cannot move.
                     // Player MUST move the checkable piece
                     return checkablePiece
@@ -79,15 +79,113 @@ export default class Piece {
         }
     }
 
-    getAvailableMoves(board, allowChecks=false){
-        if (allowChecks === false && this.cannotTake === false){
-            let checkedPiece = this.getCheckedPieces(board)
-            if (!!checkedPiece){
-                return []
+    filterHeroMoves(board, allMoves, defender){
+        function vectorContains(vecList, item){
+            return vecList.some(i => i.equals(item))
+        }
+
+        function calculateAttackVector(board, attackerPos, defenderPos){
+            let direction = [0, 0]
+            if (attackerPos.row > defenderPos.row){
+                // attacker is above defender
+                direction[0] = -1
+            } else if (attackerPos.row < defenderPos.row){
+                // attacker is below defender
+                direction[0] = 1
+            }
+
+            if (attackerPos.col > defenderPos.col){
+                // attacker is right of defender
+                direction[1] = -1
+            } else if (attackerPos.col < defenderPos.col){
+                // attacker is left of defender
+                direction[1] = 1
+            }
+
+            let path = []
+            for (let sq of this.constructVectorPath(board, attackerPos, ...direction)){
+                path.push(sq)
+                if (sq.equals(defenderPos)){
+                    break
+                }
+            }
+            return sq
+        }
+
+        let disruptiveMoves = []
+        let requiredCount = defender.attackers.length
+        let defenderPos = board.findPiece(defender)
+        for (let attacker of defender.attackers){
+            console.log(attacker)
+            let attackerPos = board.findPiece(attacker)
+            let attackerVectors = attacker.getMoveVectors(board)
+
+            if (this.canMoveTo(board, attackerPos)){
+                if (allMoves.some(i => attackerPos.equals(i))){
+                    console.log("can move to attackerPos")
+                    // can we take the attacker?
+                    disruptiveMoves.push(attackerPos)
+                }
+            }
+
+            if (attackerVectors.length === 0 && attacker.canJump){
+                // attacker can jump. Only solution is to take the attacker
+                continue
+            }
+            if (attackerVectors.length === 0){
+                // attacker does not have static attack vectors.
+                // We have to calculate what their current attack vector is
+                let tmp = calculateAttackVector(board, attackerPos, defenderPos)
+                console.log("calculated paths")
+                console.log(tmp)
+                attackerVectors = [tmp]
+            }
+
+
+            for (let vector of attackerVectors){
+                if (vectorContains(vector, defenderPos)){
+                    // if THIS is the vector that affects the defender
+                    for (let move of allMoves){
+                        if (vectorContains(vector, move)){
+                            // if we can move into this vector to disrupt it
+                            disruptiveMoves.push(move)
+                        }
+                    }
+                }
             }
         }
 
+        if (disruptiveMoves.length < requiredCount){
+            return []
+        }
+
+        // now we have to find moves that are CONSISTENT across ALL attackers.
+        // we can stop all of them or we can stop None of them
+
+        let disruptive = []
+        for (let move of disruptiveMoves){
+            if (!disruptive.some(i => i.equals(move))){
+                // not already in list
+                if (disruptiveMoves.filter(i => move.equals(i)).length >= requiredCount){
+                    // correct num of elements
+                    disruptive.push(move)
+                }
+            }
+        }
+        return disruptive
+    }
+
+    getAvailableMoves(board, allowChecks=false){
         let allMoves = this._getAvailableMoves(board)
+
+        if (allowChecks === false && this.cannotTake === false){
+            let checkedPiece = this.getCheckedPieces(board)
+            if (!!checkedPiece){
+                // ok so we have a checked king. Can we move to fix that?
+                return this.filterHeroMoves(board, allMoves, checkedPiece)
+            }
+        }
+
         if (allowChecks !== false){
             return allMoves
         }
@@ -117,10 +215,18 @@ export default class Piece {
                         continue
                     }
                     if (this.canCheck(board, Square.at(i, j))){
-                        checkablePiece.attackers[this] = this.getAvailableMoves(board, {allowChecks: true})
-                    } else if (this in checkablePiece.attackers){
-                        // cannot check, still in attackers list. Have to remove ourselves
-                        delete checkablePiece.attackers[this]
+                        if (checkablePiece.attackers.indexOf(this) === -1){
+                            checkablePiece.attackers.push(this)
+                        }
+                    } else {
+                        // remove
+                        while (true){
+                            let index = checkablePiece.attackers.indexOf(this)
+                            if (index === -1){
+                                break
+                            }
+                            checkablePiece.attackers.splice(index, 1)
+                        }
                     }
                     checkConcluded = true
                     break

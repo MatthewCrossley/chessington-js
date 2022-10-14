@@ -7,7 +7,7 @@ export default class King extends Piece {
     constructor(player) {
         super(player);
         this.cannotTake = true
-        this.attackers = {}
+        this.attackers = []
     }
 
     squareIsChecked(board, square){
