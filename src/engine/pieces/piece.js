@@ -17,17 +17,8 @@ export default class Piece {
         let currentSquare = board.findPiece(this)
         let vectors = []
         for (let inc of this.getMoveIncrements()){
-            let group = []
-            let lastMove = currentSquare
-            while (true){
-                let tmpMove = Square.at(lastMove.row + inc[0], lastMove.col + inc[1])
-                if (!board.squareExists(tmpMove)){
-                    break
-                }
-                group.push(tmpMove)
-                lastMove = tmpMove
-            }
-            vectors.push(group)
+            let path = this.constructVectorPath(board, currentSquare, ...inc)
+            vectors.push(path)
         }
         return vectors
     }
@@ -175,22 +166,31 @@ export default class Piece {
         return false
     }
 
-    checkAvailableMoves(board, currentSquare, rowIncrement, colIncrement){
+    constructVectorPath(board, startPos, rowIncrement, colIncrement){
         let moves = []
-        var lastMove = currentSquare
+        var lastMove = startPos
         while (true){
             let tmpMove = Square.at(lastMove.row + rowIncrement, lastMove.col + colIncrement)
-            if (this.canMoveTo(board, tmpMove)){
-                moves.push(tmpMove)
-                if (!board.availableSquare(tmpMove)){
+            if (!board.squareExists(tmpMove)){
+                break
+            }
+            moves.push(tmpMove)
+            lastMove = tmpMove
+        }
+        return moves
+    }
+
+    checkAvailableMoves(board, currentSquare, rowIncrement, colIncrement){
+        let moves = []
+        for (let square of this.constructVectorPath(board, currentSquare, rowIncrement, colIncrement)){
+            if (this.canMoveTo(board, square)){
+                moves.push(square)
+                if (!board.availableSquare(square)){
                     // we can move there but only to take a piece
                     // so break here so we don't calculate moves beyond this piece
                     break
                 }
-            } else {
-                break
             }
-            lastMove = tmpMove
         }
         return moves
     }
