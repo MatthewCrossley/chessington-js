@@ -9,7 +9,7 @@ export default class King extends Piece {
         this.cannotTake = true
     }
 
-    squareisChecked(board, square){
+    squareIsChecked(board, square){
         let checkable = false
         for (let row = 0; row < board.board.length; row++) {
             for (let col = 0; col < board.board[row].length; col++) {
@@ -38,7 +38,7 @@ export default class King extends Piece {
             return castleMoves
         }
         let currentSquare = board.findPiece(this)
-        if (this.squareisChecked(board, currentSquare)){
+        if (this.squareIsChecked(board, currentSquare)){
             return castleMoves
         }
 
@@ -91,7 +91,7 @@ export default class King extends Piece {
                 if (this.canMoveTo(board, tmpMove)){
                     // can we take the piece?
                     // Only if it cannot take the space we're trying to move to
-                    if (!this.squareisChecked(board, tmpMove)){
+                    if (!this.squareIsChecked(board, tmpMove)){
                         moves.push(tmpMove)
                     }
                 }
@@ -128,7 +128,7 @@ export default class King extends Piece {
     checkAvailableMoves(board, currentSquare, rowIncrement, colIncrement){
         let moves = []
         for (let move of super.checkAvailableMoves(board, currentSquare, rowIncrement, colIncrement)){
-            if (this.squareisChecked(board, move)){
+            if (this.squareIsChecked(board, move)){
                 break
             }
             moves.push(move)
