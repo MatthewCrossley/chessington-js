@@ -134,6 +134,19 @@ describe('Pawn', () => {
             const promotedPawn = board.getPiece(Square.at(7, 0));
             promotedPawn.should.be.instanceOf(Queen)
         });
+
+        it('cannot move out of the way when blocking a check', () => {
+            const pawn = new Pawn(Player.WHITE);
+            const king = new King(Player.WHITE);
+            const hostilePiece = new Rook(Player.BLACK);
+            board.setPiece(Square.at(1, 3), pawn);
+            board.setPiece(Square.at(1, 4), king);
+            board.setPiece(Square.at(1, 0), hostilePiece);
+    
+            const moves = pawn.getAvailableMoves(board);
+    
+            moves.should.deep.equal([]);
+        });
     });
 
     describe('black pawns', () => {
@@ -260,6 +273,19 @@ describe('Pawn', () => {
 
             const promotedPawn = board.getPiece(Square.at(0, 0));
             promotedPawn.should.be.instanceOf(Queen)
+        });
+
+        it('cannot move out of the way when blocking a check', () => {
+            const pawn = new Pawn(Player.BLACK);
+            const king = new King(Player.BLACK);
+            const hostilePiece = new Rook(Player.WHITE);
+            board.setPiece(Square.at(1, 3), pawn);
+            board.setPiece(Square.at(1, 4), king);
+            board.setPiece(Square.at(1, 0), hostilePiece);
+    
+            const moves = pawn.getAvailableMoves(board);
+    
+            moves.should.deep.equal([]);
         });
     });
 

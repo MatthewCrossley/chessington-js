@@ -5,6 +5,7 @@ import King from '../../../src/engine/pieces/king';
 import Player from '../../../src/engine/player';
 import Square from '../../../src/engine/square';
 import Board from '../../../src/engine/board';
+import Rook from '../../../src/engine/pieces/rook';
 
 describe('Bishop', () => {
 
@@ -89,5 +90,18 @@ describe('Bishop', () => {
         const moves = bishop.getAvailableMoves(board);
 
         moves.should.not.deep.include(Square.at(6, 6));
+    });
+
+    it('cannot move out of the way when blocking a check', () => {
+        const bishop = new Bishop(Player.WHITE);
+        const king = new King(Player.WHITE);
+        const hostilePiece = new Rook(Player.BLACK);
+        board.setPiece(Square.at(1, 3), bishop);
+        board.setPiece(Square.at(1, 4), king);
+        board.setPiece(Square.at(1, 0), hostilePiece);
+
+        const moves = bishop.getAvailableMoves(board);
+
+        moves.should.deep.equal([]);
     });
 });

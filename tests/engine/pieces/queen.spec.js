@@ -5,7 +5,7 @@ import King from '../../../src/engine/pieces/king';
 import Board from '../../../src/engine/board';
 import Player from '../../../src/engine/player';
 import Square from '../../../src/engine/square';
-import GameSettings from '../../../src/engine/gameSettings';
+import Rook from '../../../src/engine/pieces/rook';
 
 describe('Queen', () => {
 
@@ -106,5 +106,23 @@ describe('Queen', () => {
         const moves = queen.getAvailableMoves(board);
 
         moves.should.not.deep.include(Square.at(4, 6));
+    });
+
+    it('cannot move out of the way when blocking a check', () => {
+        const queen = new Queen(Player.WHITE);
+        const king = new King(Player.WHITE);
+        const hostilePiece = new Rook(Player.BLACK);
+        board.setPiece(Square.at(1, 3), queen);
+        board.setPiece(Square.at(1, 5), king);
+        board.setPiece(Square.at(1, 0), hostilePiece);
+
+        const moves = queen.getAvailableMoves(board);
+
+        moves.should.deep.equal([
+            Square.at(1, 0),
+            Square.at(1, 1),
+            Square.at(1, 2),
+            Square.at(1, 4)
+        ]);
     });
 });
