@@ -142,7 +142,10 @@ export default class Piece {
                             for (let move of allMoves){
                                 // if we start in this vector and move out of it, thus opening the attack
                                 if (!group.some(i => i.equals(move))){
-                                    invalids.push(move)
+                                    if (!move.equals(Square.at(i, j))){
+                                        // unless we move out to take the piece
+                                        invalids.push(move)
+                                    }
                                 }
                             }
                         }
