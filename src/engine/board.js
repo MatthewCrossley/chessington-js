@@ -1,6 +1,7 @@
 import Player from './player';
 import GameSettings from './gameSettings';
 import Square from './square';
+import King from './pieces/king';
 
 export default class Board {
     constructor(currentPlayer) {
@@ -59,6 +60,21 @@ export default class Board {
             this.setPiece(toSquare, movingPiece);
             this.setPiece(fromSquare, undefined);
             this.currentPlayer = (this.currentPlayer === Player.WHITE ? Player.BLACK : Player.WHITE);
+
+            if (movingPiece instanceof King){
+                movingPiece.updateAttackers(this);
+            } else {
+                for (let i = 0; i < this.board.length; i++){
+                    for (let j = 0; j < this.board.length; j++){
+                        let sq = Square.at(i, j)
+                        let p = this.getPiece(sq)
+                        if (p !== undefined && p.player === this.currentPlayer && p instanceof King){
+                            p.updateAttackers(this);
+                            return
+                        }
+                    }
+                }
+            }
         }
     }
 }

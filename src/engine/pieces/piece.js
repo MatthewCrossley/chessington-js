@@ -50,8 +50,7 @@ export default class Piece {
         throw new Error('This method must be implemented, and return a list of available moves');
     }
 
-    getCheckedPieces(board){
-        let checkConcluded = false
+    getCheckablePieces(board){
         for (let i = 0; i < board.board.length; i++){
             for (let j = 0; j < board.board.length; j++){
                 let checkablePiece = board.getPiece(Square.at(i, j))
@@ -65,18 +64,118 @@ export default class Piece {
                 if (checkablePiece.cannotTake === false){
                     continue
                 }
-                if (checkablePiece.attackers.length > 0){
-                    // if the piece's current square is checked, we cannot move.
-                    // Player MUST move the checkable piece
-                    return checkablePiece
-                }
-                checkConcluded = true
-                break
-            }
-            if (checkConcluded){
-                break
+                return checkablePiece
             }
         }
+    }
+
+    getCheckedPieces(board){
+        let checkablePiece = this.getCheckablePieces(board)
+        if (checkablePiece.attackers.length > 0){
+            return checkablePiece
+        }
+        // let checkConcluded = false
+        // for (let i = 0; i < board.board.length; i++){
+        //     for (let j = 0; j < board.board.length; j++){
+        //         let checkablePiece = board.getPiece(Square.at(i, j))
+        //         if (!checkablePiece){
+        //             // if checkablePiece is undefined
+        //             continue
+        //         }
+        //         if (checkablePiece.player !== this.player){
+        //             continue
+        //         }
+        //         if (checkablePiece.cannotTake === false){
+        //             continue
+        //         }
+        //         if (checkablePiece.attackers.length > 0){
+        //             // if the piece's current square is checked, we cannot move.
+        //             // Player MUST move the checkable piece
+        //             return checkablePiece
+        //         }
+        //         checkConcluded = true
+        //         break
+        //     }
+        //     if (checkConcluded){
+        //         break
+        //     }
+        // }
+    }
+
+    flattenMoveVectors(moveVectors){
+        let flat = []
+        for (let arr of moveVectors){
+            if (arr instanceof Square){
+                flat.push(arr)
+            } else {
+                for (let move of arr){
+                    flat.push(move)
+                }
+            }
+        }
+        return flat
+    }
+
+    filterCheckBlockingMoves(board, allMoves){
+        let defender = this.getCheckablePieces(board)
+        if (defender === undefined){
+            return allMoves
+        }
+        let defenderPos = board.findPiece(defender)
+        let currentSquare = board.findPiece(this)
+        let invalids = []
+        // get all peices that are not attacking that COULD check the king
+        for (let i = 0; i < board.board.length; i++){
+            for (let j = 0; j < board.board.length; j++){
+                let p = board.getPiece(Square.at(i, j))
+                if (p === undefined){
+                    continue
+                }
+                if (p.player === this.player){
+                    continue
+                }
+                let pVec = p.getMoveVectors(board)
+                if (pVec.length === 0){
+                    continue
+                }
+                let flatPVec = this.flattenMoveVectors(pVec)
+                if (!flatPVec.some(i => defenderPos.equals(i))){
+                    continue
+                }
+                for (let group of pVec){
+                    if (group instanceof Square){
+                        group = [group,]
+                    }
+                    let piecesInTheWay = []
+                    for (let gSq of group){
+                        if (!group.some(i => i.equals(currentSquare))){
+                            continue
+                        }
+                        let atSq = board.getPiece(gSq)
+                        if (atSq === undefined){
+                            continue
+                        }
+                        if (atSq === defender){
+                            break
+                        }
+                        piecesInTheWay.push(atSq)
+                    }
+                    if (piecesInTheWay.length === 1 && piecesInTheWay.includes(this)){
+                        // if we are the only piece blocking this vector
+                        if (group.some(i => i.equals(currentSquare))){
+                            for (let move of allMoves){
+                                // if we start in this vector and move out of it, thus opening the attack
+                                if (!group.some(i => i.equals(move))){
+                                    invalids.push(move)
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        return allMoves.filter(i => !invalids.some(j => i.equals(j)))
     }
 
     filterHeroMoves(board, allMoves, defender){
@@ -116,13 +215,11 @@ export default class Piece {
         let requiredCount = defender.attackers.length
         let defenderPos = board.findPiece(defender)
         for (let attacker of defender.attackers){
-            console.log(attacker)
             let attackerPos = board.findPiece(attacker)
             let attackerVectors = attacker.getMoveVectors(board)
 
             if (this.canMoveTo(board, attackerPos)){
                 if (allMoves.some(i => attackerPos.equals(i))){
-                    console.log("can move to attackerPos")
                     // can we take the attacker?
                     disruptiveMoves.push(attackerPos)
                 }
@@ -136,11 +233,8 @@ export default class Piece {
                 // attacker does not have static attack vectors.
                 // We have to calculate what their current attack vector is
                 let tmp = calculateAttackVector(board, attackerPos, defenderPos)
-                console.log("calculated paths")
-                console.log(tmp)
                 attackerVectors = [tmp]
             }
-
 
             for (let vector of attackerVectors){
                 if (vectorContains(vector, defenderPos)){
@@ -172,7 +266,10 @@ export default class Piece {
                 }
             }
         }
-        return disruptive
+
+        // todo: don't let pieces move away from blocking a check
+
+        return this.filterCheckBlockingMoves(board, disruptive)
     }
 
     getAvailableMoves(board, allowChecks=false){
@@ -187,7 +284,7 @@ export default class Piece {
         }
 
         if (allowChecks !== false){
-            return allMoves
+            return this.filterCheckBlockingMoves(board, allMoves)
         }
         let moves = []
         for (let move of allMoves){
@@ -197,7 +294,7 @@ export default class Piece {
             }
             moves.push(move)
         }
-        return moves
+        return this.filterCheckBlockingMoves(board, moves)
     }
 
     updateCheckablePieces(board){

@@ -10,6 +10,18 @@ export default class King extends Piece {
         this.attackers = []
     }
 
+    updateAttackers(board){
+        let invalids = []
+        let currentSquare = board.findPiece(this)
+        for (let attacker of this.attackers){
+            if (!attacker.canCheck(board, currentSquare)){
+                invalids.push(attacker);
+            }
+        }
+
+        this.attackers = this.attackers.filter(i => !invalids.includes(i))
+    }
+
     squareIsChecked(board, square){
         let checkable = false
         for (let row = 0; row < board.board.length; row++) {
