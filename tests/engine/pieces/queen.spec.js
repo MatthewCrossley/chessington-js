@@ -116,13 +116,14 @@ describe('Queen', () => {
         board.setPiece(Square.at(1, 5), king);
         board.setPiece(Square.at(1, 0), hostilePiece);
 
-        const moves = queen.getAvailableMoves(board);
+        // sort both arrays because deep.equal checks order as well
+        const moves = queen.getAvailableMoves(board).sort();
 
         moves.should.deep.equal([
             Square.at(1, 0),
             Square.at(1, 1),
             Square.at(1, 2),
             Square.at(1, 4)
-        ]);
+        ].sort());
     });
 });
