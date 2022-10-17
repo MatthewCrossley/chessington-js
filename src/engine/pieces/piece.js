@@ -71,35 +71,11 @@ export default class Piece {
 
     getCheckedPieces(board){
         let checkablePiece = this.getCheckablePieces(board)
-        if (checkablePiece.attackers.length > 0){
-            return checkablePiece
+        if (checkablePiece !== undefined){
+            if (checkablePiece.attackers.length > 0){
+                return checkablePiece
+            }
         }
-        // let checkConcluded = false
-        // for (let i = 0; i < board.board.length; i++){
-        //     for (let j = 0; j < board.board.length; j++){
-        //         let checkablePiece = board.getPiece(Square.at(i, j))
-        //         if (!checkablePiece){
-        //             // if checkablePiece is undefined
-        //             continue
-        //         }
-        //         if (checkablePiece.player !== this.player){
-        //             continue
-        //         }
-        //         if (checkablePiece.cannotTake === false){
-        //             continue
-        //         }
-        //         if (checkablePiece.attackers.length > 0){
-        //             // if the piece's current square is checked, we cannot move.
-        //             // Player MUST move the checkable piece
-        //             return checkablePiece
-        //         }
-        //         checkConcluded = true
-        //         break
-        //     }
-        //     if (checkConcluded){
-        //         break
-        //     }
-        // }
     }
 
     flattenMoveVectors(moveVectors){
